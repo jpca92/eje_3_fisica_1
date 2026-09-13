@@ -55,6 +55,10 @@ export function calculateScenario({ force, normalForce, coefficient, kineticCoef
     }
   }
 
+  if (isProvided(kineticCoefficient) && kineticCoefficient > resolvedCoefficient) {
+    throw new Error("El coeficiente cinético no puede ser mayor que el estático.");
+  }
+
   return {
     force: resolvedForce,
     normalForce,

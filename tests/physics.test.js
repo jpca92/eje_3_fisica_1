@@ -48,6 +48,13 @@ test("calcula la fricción cinética cuando se proporciona μk", () => {
   assert.equal(result.kineticCoefficient, 0.1);
 });
 
+test("rechaza un coeficiente cinético mayor que el estático", () => {
+  assert.throws(
+    () => calculateScenario({ normalForce: 210, force: 42, coefficient: null, kineticCoefficient: 0.3 }),
+    /cinético no puede ser mayor que el estático/,
+  );
+});
+
 test("exige la fuerza límite o el coeficiente estático", () => {
   assert.throws(
     () => calculateScenario({ normalForce: 210, force: null, coefficient: null }),

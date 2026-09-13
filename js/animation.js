@@ -112,7 +112,11 @@ export class FrictionAnimator {
       // Se normaliza al final de la fase para mantener la escala en pantalla.
       const slideProgress = Math.min((elapsed - thresholdEnd) / ANIMATION.slideDurationMs, 1);
       const netForce = Math.max(0, this.scenario.force - this.scenario.kineticFriction);
-      const acceleration = netForce / ANIMATION.bottleMassKg;
+      // En superficie horizontal se asume N = P, por lo que la masa se deriva
+      // de la normal actual: m = N / g. Así, si el usuario cambia N, la
+      // aceleración sigue siendo coherente en lugar de usar una masa fija.
+      const mass = this.scenario.normalForce / ANIMATION.gravity;
+      const acceleration = netForce / mass;
       const totalTimeS = ANIMATION.slideDurationMs / 1000;
       const elapsedTimeS = slideProgress * totalTimeS;
       const displacementM = 0.5 * acceleration * elapsedTimeS * elapsedTimeS;

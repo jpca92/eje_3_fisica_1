@@ -11,8 +11,8 @@ export const ANIMATION = Object.freeze({
   thresholdNudgePx: 90,
   maxBarWidthPx: 220,
   // Parámetros físicos del deslizamiento (movimiento uniformemente acelerado).
-  // La masa se deriva del peso del ejercicio: m = P / g = 210 / 9.8 ≈ 21.4 kg.
-  bottleMassKg: 21.4,
+  // La masa se deriva de la normal en cada caso: m = N / g (se asume N = P).
+  gravity: 9.8,
   // Escala visual metros → píxeles.
   metersToPx: 110,
   // Tope de traslación para no salir del viewBox del SVG (el suelo llega a x≈940).
