@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulación de fricción estática - Garrafón</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Física · Fuerza de fricción</p>
+        <h1>Coeficiente de fricción estática de un garrafón</h1>
+        <p class="intro">
+          Cambia los datos del ejercicio, selecciona el caso y pulsa <strong>Iniciar</strong>.
+          La simulación representa el instante en que la fuerza aplicada alcanza la fricción estática máxima.
+          Si proporcionas μₖ, también representa el deslizamiento posterior.
+        </p>
+      </div>
+      <div class="formula-card">
+        <span>En el umbral de movimiento:</span>
+        <strong>f = f<sub>s,max</sub> = μ<sub>s</sub>N</strong>
+        <strong class="main-formula">μ<sub>s</sub> = f / N</strong>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <aside class="controls-card">
+        <h2>Datos de entrada</h2>
+        <p class="muted">Puedes conservar los valores originales o modificarlos.</p>
+
+        <label class="field">
+          <span>Fuerza normal N sobre el garrafón (N)</span>
+          <input id="normalForce" type="number" min="0.01" step="0.01" value="210" />
+        </label>
+
+        <div class="scenario-input">
+          <h3>Caso 1</h3>
+          <label class="field">
+            <span>Fuerza límite horizontal f₁ (N)</span>
+            <input id="forceCase1" type="number" min="0" step="0.01" value="42" />
+          </label>
+          <label class="field">
+            <span>Coeficiente estático μₛ₁ (opcional)</span>
+            <input id="coefficientCase1" type="number" min="0" step="0.001" placeholder="Se calcula con f₁ / N" />
+          </label>
+          <label class="field">
+            <span>Coeficiente cinético μₖ₁ (opcional)</span>
+            <input id="kineticCase1" type="number" min="0" step="0.001" placeholder="Necesario para continuar deslizándose" />
+          </label>
+        </div>
+
+        <div class="scenario-input">
+          <h3>Caso 2</h3>
+          <label class="field">
+            <span>Fuerza límite horizontal f₂ (N)</span>
+            <input id="forceCase2" type="number" min="0" step="0.01" value="21" />
+          </label>
+          <label class="field">
+            <span>Coeficiente estático μₛ₂ (opcional)</span>
+            <input id="coefficientCase2" type="number" min="0" step="0.001" placeholder="Se calcula con f₂ / N" />
+          </label>
+          <label class="field">
+            <span>Coeficiente cinético μₖ₂ (opcional)</span>
+            <input id="kineticCase2" type="number" min="0" step="0.001" placeholder="Necesario para continuar deslizándose" />
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Caso a animar</span>
+          <select id="scenarioSelect">
+            <option value="case1" selected>Caso 1</option>
+            <option value="case2">Caso 2</option>
+          </select>
+        </label>
+
+        <div class="buttons">
+          <button id="startBtn" class="primary">Iniciar</button>
+          <button id="pauseBtn">Pausar</button>
+          <button id="resetBtn">Reiniciar</button>
+        </div>
+        <button id="defaultsBtn" class="secondary full">Restaurar datos del ejercicio</button>
+        <p id="validationMessage" class="validation"></p>
+      </aside>
+
+      <section class="simulation-card">
+        <div class="simulation-header">
+          <div>
+            <h2>Simulación</h2>
+            <p id="simulationSubtitle">Caso 1 · f = 42 N · N = 210 N</p>
+          </div>
+          <span id="motionBadge" class="badge idle">En reposo</span>
+        </div>
+
+        <div class="scene-wrap">
+          <svg id="scene" class="scene" viewBox="0 0 1000 520" role="img" aria-label="Garrafón jalado sobre una superficie horizontal">
+            <defs>
+              <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#3478e5" />
+              </marker>
+              <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#d65454" />
+              </marker>
+              <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#2d9d5b" />
+              </marker>
+              <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#8359c8" />
+              </marker>
+              <linearGradient id="water" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#8fd3ff" />
+                <stop offset="100%" stop-color="#3ca5e9" />
+              </linearGradient>
+            </defs>
+
+            <rect width="1000" height="520" fill="#fbfdff" />
+            <line x1="60" y1="405" x2="940" y2="405" class="floor-line" />
+            <rect x="60" y="405" width="880" height="65" rx="8" fill="#d8e0e9" />
+
+            <g id="bottleGroup">
+              <path d="M175 212 C175 193 186 183 202 178 L202 145 L258 145 L258 178 C274 183 285 193 285 212 L302 352 C305 381 287 405 258 405 L202 405 C173 405 155 381 158 352 Z"
+                    class="bottle-shell" />
+              <path d="M171 260 L289 260 L302 352 C305 381 287 405 258 405 L202 405 C173 405 155 381 158 352 Z"
+                    fill="url(#water)" opacity="0.9" />
+              <rect x="207" y="130" width="46" height="20" rx="6" fill="#44606f" />
+              <text x="230" y="322" text-anchor="middle" class="bottle-label">AGUA</text>
+
+              <line id="forceVector" x1="302" y1="315" x2="302" y2="315" class="force blue" marker-end="url(#arrowBlue)" />
+              <text id="forceLabel" x="360" y="292" class="vector-label blue-text">f aplicada = 0 N</text>
+
+              <line id="frictionVector" x1="158" y1="360" x2="158" y2="360" class="force red" marker-end="url(#arrowRed)" />
+              <text id="frictionLabel" x="82" y="338" class="vector-label red-text">fₛ = 0 N</text>
+
+              <line x1="230" y1="212" x2="230" y2="115" class="force green" marker-end="url(#arrowGreen)" />
+              <text id="normalLabel" x="244" y="130" class="vector-label green-text">N = 210 N</text>
+
+              <line x1="230" y1="405" x2="230" y2="490" class="force purple" marker-end="url(#arrowPurple)" />
+              <text id="weightLabel" x="244" y="478" class="vector-label purple-text">P = 210 N</text>
+            </g>
+
+            <g>
+              <rect x="650" y="70" width="290" height="185" rx="18" class="comparison-box" />
+              <text x="675" y="105" class="panel-title">Comparación de fuerzas</text>
+
+              <text x="675" y="142" class="panel-label">Fuerza aplicada</text>
+              <rect x="675" y="154" width="220" height="15" rx="8" class="bar-track" />
+              <rect id="appliedBar" x="675" y="154" width="0" height="15" rx="8" fill="#3478e5" />
+
+              <text id="frictionBarLabel" x="675" y="198" class="panel-label">Fricción actual</text>
+              <rect x="675" y="210" width="220" height="15" rx="8" class="bar-track" />
+              <rect id="frictionBar" x="675" y="210" width="0" height="15" rx="8" fill="#d65454" />
+              <text id="appliedCurrentValue" x="905" y="167" text-anchor="end" class="panel-value">0 N</text>
+              <text id="frictionCurrentValue" x="905" y="223" text-anchor="end" class="panel-value">0 N</text>
+            </g>
+
+            <text x="65" y="505" class="scene-note">En el umbral, f = fₛ,max. Con μₖ, después se muestra el deslizamiento.</text>
+          </svg>
+        </div>
+
+        <div class="progress-row">
+          <span>Progreso</span>
+          <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+          <strong id="progressValue">0%</strong>
+        </div>
+      </section>
+    </section>
+
+    <section class="results-card">
+      <h2>Resultados</h2>
+        <p class="muted">Se recalculan automáticamente. En cada caso se necesita N y la fuerza límite o μₛ.</p>
+      <div class="results-grid">
+        <article class="result-box">
+          <span class="kicker">Caso 1</span>
+          <h3>Coeficiente de fricción estática</h3>
+          <p class="equation">μₛ₁ = <span id="case1ForceEquation">42</span> / <span id="case1NormalEquation">210</span></p>
+          <strong id="muCase1" class="result-value">0.200</strong>
+          <p id="case1KineticResult" class="muted"></p>
+        </article>
+        <article class="result-box">
+          <span class="kicker">Caso 2</span>
+          <h3>Coeficiente de fricción estática</h3>
+          <p class="equation">μₛ₂ = <span id="case2ForceEquation">21</span> / <span id="case2NormalEquation">210</span></p>
+          <strong id="muCase2" class="result-value">0.100</strong>
+          <p id="case2KineticResult" class="muted"></p>
+        </article>
+        <article class="result-box">
+          <span class="kicker">Interpretación</span>
+          <h3>Comparación</h3>
+          <p id="interpretationText" class="interpretation"></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="theory-card">
+      <h2>Qué representa la simulación</h2>
+      <p>
+        Mientras el garrafón está quieto, la fricción estática se ajusta a la fuerza aplicada.
+        En el instante exacto en que empieza a deslizarse, esa fricción alcanza su valor máximo.
+        Después del umbral actúa la fricción cinética, que solo puede simularse si se proporciona μₖ.
+      </p>
+      <div class="formula-grid">
+        <code>fₛ,max = μₛN</code>
+        <code>μₛ = fₛ,max / N</code>
+        <code>Con 42 N y 210 N: μₛ = 0.20</code>
+      </div>
+      <p class="note-box">
+        La normal mostrada apunta hacia arriba porque es la fuerza que la superficie ejerce sobre el garrafón.
+        Su magnitud es igual al peso (210 N en este ejercicio). El segundo caso representa una condición hipotética distinta;
+        para el mismo contacto físico, μₛ no cambia solo por aplicar una fuerza diferente.
+      </p>
+    </section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
