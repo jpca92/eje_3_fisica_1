@@ -97,17 +97,29 @@ export class FrictionAnimator {
       this.state = "threshold";
       updateBadge("threshold");
       this.#renderForces(this.scenario.force, this.scenario.maxStaticFriction, "fₛ,max");
+      if (!canSimulateSliding) {
+        const thresholdProgress = (elapsed - pullEnd) / ANIMATION.thresholdDurationMs;
+        const eased = 1 - Math.pow(1 - Math.max(0, Math.min(1, thresholdProgress)), 3);
+        const x = ANIMATION.thresholdNudgePx * eased;
+        this.bottleGroup.setAttribute("transform", `translate(${x} 0)`);
+      }
     } else if (canSimulateSliding) {
       this.state = "moving";
       updateBadge("moving");
       this.#renderForces(this.scenario.force, this.scenario.kineticFriction, "fₖ");
+      // Movimiento uniformemente acelerado: con fuerza neta constante,
+      // la aceleración es constante (a = F_net / m) y x = ½·a·t².
+      // Se normaliza al final de la fase para mantener la escala en pantalla.
       const slideProgress = Math.min((elapsed - thresholdEnd) / ANIMATION.slideDurationMs, 1);
-      const eased = 1 - Math.pow(1 - slideProgress, 3);
-      const netForce = this.scenario.force - this.scenario.kineticFriction;
-      const motionFactor = this.scenario.force > 0
-        ? Math.max(0, Math.min(1, netForce / this.scenario.force))
-        : 0;
-      const x = ANIMATION.maxBottleTranslationPx * motionFactor * eased;
+      const netForce = Math.max(0, this.scenario.force - this.scenario.kineticFriction);
+      const acceleration = netForce / ANIMATION.bottleMassKg;
+      const totalTimeS = ANIMATION.slideDurationMs / 1000;
+      const elapsedTimeS = slideProgress * totalTimeS;
+      const displacementM = 0.5 * acceleration * elapsedTimeS * elapsedTimeS;
+      const x = Math.min(
+        ANIMATION.thresholdNudgePx + displacementM * ANIMATION.metersToPx,
+        ANIMATION.maxTravelPx
+      );
       this.bottleGroup.setAttribute("transform", `translate(${x} 0)`);
     }
 
