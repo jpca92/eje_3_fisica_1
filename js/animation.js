@@ -128,6 +128,13 @@ export class FrictionAnimator {
       updateBadge(this.state);
       updateProgress(1);
       this.elapsedBeforePause = 0;
+      // Fija la posición final de forma determinista, sin depender de que el
+      // último frame se haya renderizado (evita que el empujón se pierda si el
+      // navegador limita los frames, p. ej. en GitHub Pages).
+      if (!canSimulateSliding) {
+        this.#renderForces(this.scenario.force, this.scenario.maxStaticFriction, "fₛ,max");
+        this.bottleGroup.setAttribute("transform", `translate(${ANIMATION.thresholdNudgePx} 0)`);
+      }
       return;
     }
 
